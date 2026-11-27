@@ -2,7 +2,6 @@
 # For license information, please see license.txt
 
 import frappe
-from frappe import _
 from frappe.tests import IntegrationTestCase
 from frappe.utils import flt
 
@@ -214,7 +213,23 @@ class TestWPSSalaryFile(IntegrationTestCase):
 def _company() -> str:
 	company = frappe.db.get_value("Company", {}, "name")
 	if not company:
-		frappe.throw(_("A Company is required for the WPS fetch test."))
+		if not frappe.db.exists("Currency", "AED"):
+			frappe.get_doc({"doctype": "Currency", "currency_name": "AED", "enabled": 1}).insert(
+				ignore_permissions=True
+			)
+		company = (
+			frappe.get_doc(
+				{
+					"doctype": "Company",
+					"company_name": "WPS Test Company",
+					"abbr": "WTC",
+					"default_currency": "AED",
+					"country": "United Arab Emirates",
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
 	frappe.db.set_value("Company", company, "wps_enabled", 1)
 	return company
 
@@ -239,6 +254,8 @@ def _agent() -> str:
 
 def _employee(company: str, agent: str | None, eligible: int) -> str:
 	gender = frappe.db.get_value("Gender", {}, "name")
+	if not gender:
+		gender = frappe.get_doc({"doctype": "Gender", "gender": "Male"}).insert(ignore_permissions=True).name
 	employee = frappe.get_doc(
 		{
 			"doctype": "Employee",
