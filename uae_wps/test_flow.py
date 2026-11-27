@@ -54,7 +54,7 @@ class TestFlow(IntegrationTestCase):
 		self.assertEqual([agent.name for agent in declared], ["uae_wps/UAE WPS"])
 		self.assertEqual(
 			[tool.name for tool in declared[0].tools],
-			["wps_file_summary", "fetch_wps_salary_slips"],
+			["wps_file_summary", "fetch_wps_salary_slips", "generate_wps_sif"],
 		)
 		sync_skills()
 		sync_agents()

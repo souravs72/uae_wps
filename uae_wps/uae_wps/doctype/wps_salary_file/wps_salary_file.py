@@ -29,8 +29,14 @@ class WPSSalaryFile(Document):
 		previous_status = frappe.db.get_value(self.doctype, self.name, "status")
 		if previous_status in LOCKED_STATUSES:
 			frappe.throw(_("This WPS Salary File is {0} and cannot be changed.").format(previous_status))
+		if self.flags.get("wps_generating"):
+			if self.status != "Generated":
+				frappe.throw(_("Generating the SIF file sets the status to Generated."))
+			return
 		if self.status != previous_status:
-			frappe.throw(_("Status changes when salary slips are fetched, not by editing the field."))
+			frappe.throw(
+				_("Status changes when salary slips are fetched or the SIF file is generated.")
+			)
 		self._reject_foreign_employee_rows()
 
 	def before_save(self):
@@ -77,6 +83,44 @@ class WPSSalaryFile(Document):
 		write_component_rows(self)
 		return result
 
+	@frappe.whitelist(methods=["POST"])
+	def generate_sif(self) -> dict:
+		self.check_permission("write")
+		if self.is_new():
+			frappe.throw(_("Save the WPS Salary File before generating the SIF file."))
+		self.load_from_db()
+		self.check_permission("write")
+		if self.status in LOCKED_STATUSES:
+			frappe.throw(
+				_("This WPS Salary File is {0} and its SIF file cannot be generated again.").format(self.status)
+			)
+		from uae_wps.payroll import load_component_rows
+		from uae_wps.sif import generate_sif_content
+
+		load_component_rows(self)
+		content, filename, created = generate_sif_content(self)
+		file_doc = _attach_sif(self, filename, content)
+		self.status = "Generated"
+		self.sif_file = file_doc.file_url
+		self.file_name = filename
+		self.file_hash = frappe.utils.sha256_hash(content)
+		self.generated_at = created
+		self.generated_by = frappe.session.user
+		self.flags.wps_generating = True
+		try:
+			self.save()
+		except Exception:
+			frappe.delete_doc("File", file_doc.name, ignore_permissions=True, force=True)
+			raise
+		finally:
+			self.flags.wps_generating = False
+		return {
+			"file_name": file_doc.file_name,
+			"file_url": file_doc.file_url,
+			"file_hash": self.file_hash,
+			"status": self.status,
+		}
+
 	def _reject_foreign_employee_rows(self) -> None:
 		names = [row.name for row in (self.employees or []) if row.name and not row.is_new()]
 		if not names:
@@ -90,3 +134,35 @@ class WPSSalaryFile(Document):
 		)
 		if any(name not in owned for name in names):
 			frappe.throw(_("An employee row on this file belongs to another WPS Salary File."))
+
+
+def _attach_sif(doc, filename: str, content: bytes):
+	"""Store the SIF under its mandated name.
+
+	Frappe checks upload extensions only while a web request is active. This file is
+	produced by the app, so that check is skipped for the insert and then restored.
+	"""
+	file_doc = frappe.get_doc(
+		{
+			"doctype": "File",
+			"file_name": filename,
+			"attached_to_doctype": doc.doctype,
+			"attached_to_name": doc.name,
+			"attached_to_field": "sif_file",
+			"is_private": 1,
+			"content": content,
+		}
+	)
+	file_doc.flags.ignore_permissions = True
+	request = getattr(frappe.local, "request", None)
+	try:
+		frappe.local.request = None
+		file_doc.insert()
+	finally:
+		frappe.local.request = request
+	if file_doc.file_name != filename:
+		frappe.delete_doc("File", file_doc.name, ignore_permissions=True, force=True)
+		frappe.throw(
+			_("A SIF file named {0} already exists. Wait a second and generate it again.").format(filename)
+		)
+	return file_doc

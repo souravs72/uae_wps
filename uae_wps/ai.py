@@ -19,9 +19,9 @@ INSTRUCTIONS = """You prepare UAE WPS salary files from HRMS. You do not run pay
 Before the first WPS action in a conversation, load the skill uae_wps/uae-wps when it is available.
 
 Use wps_file_summary to read one file. Use fetch_wps_salary_slips to copy submitted Salary Slips
-into a Draft or Validated file. Both tools call the app's own code. Do not recompute amounts,
-guess a Fixed or Variable category, change a Salary Slip, or write SIF lines. If the user asks
-for a .SIF file, say that step is not available yet."""
+into a Draft or Validated file. Use generate_wps_sif to write the SIF file from that snapshot.
+All three tools call the app's own code. Do not recompute amounts, guess a Fixed or Variable
+category, change a Salary Slip, or type SIF lines yourself. If generation refuses, repeat its message."""
 
 
 @tool(requires_confirmation=False)
@@ -75,6 +75,27 @@ def fetch_wps_salary_slips(wps_salary_file: str, *, ctx: ToolContext) -> dict:
 	return doc.fetch_salary_slips()
 
 
+@tool(
+	requires_confirmation=True,
+	display_template="Generating the SIF file for {{ wps_salary_file }}",
+)
+def generate_wps_sif(wps_salary_file: str, *, ctx: ToolContext) -> dict:
+	"""Write the UAE WPS SIF file for one salary file.
+
+	Uses the saved snapshot. Does not change payroll documents or invent salary amounts.
+	The caller must be allowed to write the file. A generated file is refused.
+	"""
+	if ctx.user and ctx.user != frappe.session.user:
+		frappe.throw(_("This tool runs as the signed-in user."))
+	if ctx.read_only:
+		frappe.throw(_("Generating a SIF file writes the WPS Salary File, so it cannot run as a read."))
+	name = (wps_salary_file or "").strip()
+	if not name:
+		frappe.throw(_("Name the WPS Salary File to generate."))
+	doc = frappe.get_doc("WPS Salary File", name)
+	return doc.generate_sif()
+
+
 def agents() -> list[Agent]:
 	"""The WPS agent, once the site has an enabled Flow Model.
 
@@ -88,9 +109,9 @@ def agents() -> list[Agent]:
 		Agent(
 			name="UAE WPS",
 			model=model,
-			description="Reads a WPS Salary File and fetches submitted HRMS slips into it.",
+			description="Reads a WPS Salary File, fetches submitted HRMS slips, and writes the SIF file.",
 			instructions=INSTRUCTIONS,
-			tools=[wps_file_summary, fetch_wps_salary_slips],
+			tools=[wps_file_summary, fetch_wps_salary_slips, generate_wps_sif],
 			skills=skills,
 		)
 	]

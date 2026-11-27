@@ -85,7 +85,7 @@
    "fieldname": "supports_evp",
    "fieldtype": "Check",
    "label": "Supports EVP",
-   "description": "When set, variable pay is also written as a separate EVP record. It is not added again on top of the EDR variable amount."
+   "description": "When set, variable pay is also written as an EVP record immediately after the EDR. The seven EVP amounts must add up to the EDR variable amount."
   },
   {
    "default": "0",
