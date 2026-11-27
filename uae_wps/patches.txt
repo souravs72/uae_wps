@@ -6,3 +6,4 @@
 # Patches added in this section will be executed after doctypes are migrated
 uae_wps.patches.v1_0.add_wps_custom_fields
 uae_wps.patches.v1_0.add_wps_evp_component
+uae_wps.patches.v1_0.rename_salary_file_statuses

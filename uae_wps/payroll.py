@@ -12,9 +12,9 @@ from collections import defaultdict
 
 import frappe
 from frappe import _
-from frappe.utils import cint, date_diff, flt, getdate
+from frappe.utils import add_months, cint, date_diff, flt, get_first_day, getdate
 
-LOCKED_STATUSES = ("Generated", "Downloaded", "Submitted", "Accepted", "Rejected")
+LOCKED_STATUSES = ("Generated", "Sent to Bank", "Accepted", "Rejected")
 CREDIT_PARENTFIELD = "earnings"
 COMPONENT_CATEGORIES = {"Fixed", "Variable", "Excluded"}
 PARENTFIELD_ORDER = {"earnings": 0, "deductions": 1, "employer_contributions": 2}
@@ -70,20 +70,39 @@ def populate_from_payroll(doc) -> dict:
 	routing_codes = _routing_codes(employee_rows, accounts)
 	details = _salary_details([slip.name for slip in submitted])
 	categories = _component_categories(details)
+	exclusions = _exclusions(doc.company, [slip.employee for slip in submitted], doc.salary_month)
 
 	notes: list[str] = []
 	seen_employees: dict[str, int] = defaultdict(int)
 	doc.set("employees", [])
+	doc.set("omissions", [])
+	wages_due = 0.0
 
 	for slip in submitted:
 		employee = employee_rows.get(slip.employee)
+		gross = flt(slip.gross_pay, 2)
 		if not employee:
 			notes.append(_("{0}: Employee {1} was not found.").format(slip.name, slip.employee))
 			continue
-		if not cint(employee.wps_eligible):
+
+		omit_reason = _omission_reason(slip, employee, exclusions)
+		if omit_reason:
+			include_in_due = omit_reason == "Salary Withholding"
+			if include_in_due:
+				wages_due += gross
+			doc.append(
+				"omissions",
+				{
+					"employee": employee.name,
+					"employee_name": employee.employee_name,
+					"salary_slip": slip.name,
+					"reason": omit_reason,
+					"entitled_amount": gross if include_in_due else 0,
+				},
+			)
 			notes.append(
-				_("{0} ({1}): not WPS eligible, so this slip was left out.").format(
-					employee.employee_name or employee.name, employee.name
+				_("{0} ({1}): left out because {2}.").format(
+					employee.employee_name or employee.name, employee.name, omit_reason
 				)
 			)
 			continue
@@ -96,8 +115,10 @@ def populate_from_payroll(doc) -> dict:
 			routing_codes,
 			details.get(slip.name, []),
 			categories,
+			pay_earnings_total=cint(doc.pay_earnings_total),
 		)
 		notes.extend(row_notes)
+		wages_due += flt(row.get("entitled_amount"), 2)
 		doc.append("employees", row)
 
 	if not doc.employees:
@@ -118,7 +139,18 @@ def populate_from_payroll(doc) -> dict:
 	doc.total_fixed_salary = flt(sum(flt(row.fixed_amount) for row in doc.employees), 2)
 	doc.total_variable_salary = flt(sum(flt(row.variable_amount) for row in doc.employees), 2)
 	doc.total_salary = flt(doc.total_fixed_salary + doc.total_variable_salary, 2)
-	doc.status = "Draft"
+	doc.wages_due = flt(wages_due, 2)
+	doc.wages_in_file = doc.total_salary
+	doc.percent_of_wages_due = (
+		flt((doc.wages_in_file / doc.wages_due) * 100, 2) if doc.wages_due else 0
+	)
+	doc.employees_below_85 = sum(
+		1
+		for row in doc.employees
+		if flt(row.entitled_amount) and flt(row.credit_amount) < flt(row.entitled_amount) * 0.85
+	)
+	doc.due_date = get_first_day(add_months(getdate(doc.salary_month), 1)) if doc.salary_month else None
+	doc.status = "Validated"
 	doc.validation_summary = "\n".join(notes)
 
 	return {
@@ -126,6 +158,9 @@ def populate_from_payroll(doc) -> dict:
 		"total_fixed_salary": doc.total_fixed_salary,
 		"total_variable_salary": doc.total_variable_salary,
 		"total_salary": doc.total_salary,
+		"wages_due": doc.wages_due,
+		"percent_of_wages_due": doc.percent_of_wages_due,
+		"due_date": doc.due_date,
 		"validation_summary": doc.validation_summary,
 	}
 
@@ -239,8 +274,11 @@ def _salary_slips(payroll_entry: str, company: str, docstatus: int) -> list[dict
 			"end_date",
 			"leave_without_pay",
 			"payment_days",
+			"gross_pay",
 			"net_pay",
 			"currency",
+			"salary_withholding",
+			"salary_withholding_cycle",
 		],
 		order_by="employee asc, name asc",
 	)
@@ -261,6 +299,8 @@ def _employees(names: list[str]) -> dict[str, dict]:
 			"wps_agent",
 			"iban",
 			"bank_ac_no",
+			"date_of_joining",
+			"relieving_date",
 		],
 	)
 	return {row.name: row for row in rows}
@@ -301,6 +341,9 @@ def _routing_codes(employees: dict[str, dict], accounts: dict[str, dict]) -> dic
 def _salary_details(slip_names: list[str]) -> dict[str, list[dict]]:
 	if not slip_names:
 		return {}
+	# Salary Detail is an istable with no DocType permissions. get_list returns
+	# nothing useful. Caller must already have passed _require_payroll_read
+	# (Salary Slip read). get_all is intentional for the child rows of those slips.
 	rows = frappe.get_all(
 		"Salary Detail",
 		filters={"parent": ["in", slip_names], "parenttype": "Salary Slip"},
@@ -339,6 +382,56 @@ def _component_categories(details: dict[str, list[dict]]) -> dict[str, str]:
 	return {row.name: row for row in rows}
 
 
+def _exclusions(company: str, employees: list[str], salary_month) -> dict[str, str]:
+	unique = [name for name in dict.fromkeys(employees) if name]
+	if not unique or not salary_month:
+		return {}
+	if not frappe.has_permission("WPS Employee Exclusion", "read"):
+		frappe.throw(
+			_("You need permission to read WPS Employee Exclusion before salary slips can be fetched."),
+			frappe.PermissionError,
+		)
+	from frappe.utils import get_last_day
+
+	month = getdate(salary_month)
+	month_start = get_first_day(month)
+	month_end = get_last_day(month)
+	rows = _read_rows(
+		"WPS Employee Exclusion",
+		filters={
+			"company": company,
+			"employee": ["in", unique],
+			"docstatus": 1,
+			"from_date": ["<=", month_end],
+			"to_date": [">=", month_start],
+		},
+		fields=["employee", "reason", "from_date"],
+		order_by="from_date desc",
+	)
+	chosen: dict[str, str] = {}
+	for row in rows:
+		chosen.setdefault(row.employee, row.reason)
+	return chosen
+
+
+def _omission_reason(slip, employee, exclusions: dict[str, str]) -> str:
+	if not cint(employee.wps_eligible):
+		return "Not WPS eligible"
+	if exclusions.get(employee.name):
+		return exclusions[employee.name]
+	if slip.salary_withholding:
+		released = 0
+		if slip.salary_withholding_cycle:
+			released = cint(
+				frappe.db.get_value(
+					"Salary Withholding Cycle", slip.salary_withholding_cycle, "is_salary_released"
+				)
+			)
+		if not released:
+			return "Salary Withholding"
+	return ""
+
+
 def _category_for_detail(detail, explicit: str) -> tuple[str, str]:
 	"""Use the WPS category when it is set. Otherwise follow the salary slip row.
 
@@ -359,8 +452,89 @@ def _category_for_detail(detail, explicit: str) -> tuple[str, str]:
 	return "Variable", _("the salary slip does not prorate it by payment days")
 
 
+def _pay_period(slip, employee) -> tuple:
+	"""Match SalarySlip.actual_start_date / actual_end_date using Employee dates."""
+	start = getdate(slip.start_date)
+	end = getdate(slip.end_date)
+	joining = getdate(employee.date_of_joining) if employee.date_of_joining else None
+	relieving = getdate(employee.relieving_date) if employee.relieving_date else None
+	if joining and start < joining <= end:
+		start = joining
+	if relieving and start <= relieving < end:
+		end = relieving
+	return start, end
+
+
+def _reduce_to_net(fixed: float, variable: float, net_pay: float, components: list[dict]) -> tuple[float, float, list[dict], str]:
+	"""Reduce variable first, then fixed, until fixed + variable equals net pay."""
+	target = flt(net_pay, 2)
+	current = flt(fixed + variable, 2)
+	if current == target:
+		return fixed, variable, components, ""
+	if current < target:
+		return fixed, variable, components, ""
+
+	reduction = flt(current - target, 2)
+	new_variable = variable
+	new_fixed = fixed
+	take_variable = min(new_variable, reduction)
+	new_variable = flt(new_variable - take_variable, 2)
+	reduction = flt(reduction - take_variable, 2)
+	if reduction:
+		take_fixed = min(new_fixed, reduction)
+		new_fixed = flt(new_fixed - take_fixed, 2)
+		reduction = flt(reduction - take_fixed, 2)
+
+	components = _scale_credit_components(components, fixed, variable, new_fixed, new_variable)
+	note = _(
+		"Fixed plus Variable was reduced from {0} to Net Pay {1} so the SIF credit matches the salary slip."
+	).format(current, target)
+	return new_fixed, new_variable, components, note
+
+
+def _scale_credit_components(
+	components: list[dict], old_fixed: float, old_variable: float, new_fixed: float, new_variable: float
+) -> list[dict]:
+	"""Keep EVP buckets in proportion when fixed or variable credit is reduced."""
+	scaled = []
+	for component in components:
+		amount = flt(component.get("amount"), 2)
+		component_type = component.get("component_type")
+		if component_type == "Fixed" and old_fixed:
+			amount = flt(amount * (new_fixed / old_fixed), 2)
+		elif component_type == "Variable" and old_variable:
+			amount = flt(amount * (new_variable / old_variable), 2)
+		row = dict(component)
+		row["amount"] = amount
+		scaled.append(row)
+
+	# Fix rounding drift on the last Fixed / Variable row so totals still match.
+	scaled = _fix_rounding(scaled, "Fixed", new_fixed)
+	scaled = _fix_rounding(scaled, "Variable", new_variable)
+	return scaled
+
+
+def _fix_rounding(components: list[dict], component_type: str, target: float) -> list[dict]:
+	indexes = [idx for idx, row in enumerate(components) if row.get("component_type") == component_type]
+	if not indexes:
+		return components
+	current = flt(sum(flt(components[idx]["amount"]) for idx in indexes), 2)
+	drift = flt(target - current, 2)
+	if not drift:
+		return components
+	last = indexes[-1]
+	components[last]["amount"] = flt(flt(components[last]["amount"]) + drift, 2)
+	return components
+
+
 def _employee_snapshot(
-	slip, employee, account, routing_codes, detail_rows, categories
+	slip,
+	employee,
+	account,
+	routing_codes,
+	detail_rows,
+	categories,
+	pay_earnings_total: int = 0,
 ) -> tuple[dict, list[str]]:
 	notes: list[str] = []
 	label = employee.employee_name or employee.name
@@ -371,9 +545,8 @@ def _employee_snapshot(
 	if slip.start_date and slip.end_date and getdate(slip.end_date) < getdate(slip.start_date):
 		frappe.throw(_("{0}: Salary Slip {1} ends before it starts.").format(label, slip.name))
 
-	days = 0
-	if slip.start_date and slip.end_date:
-		days = date_diff(slip.end_date, slip.start_date) + 1
+	pay_start, pay_end = _pay_period(slip, employee)
+	days = date_diff(pay_end, pay_start) + 1
 
 	fixed = 0.0
 	variable = 0.0
@@ -412,14 +585,28 @@ def _employee_snapshot(
 	fixed = flt(fixed, 2)
 	variable = flt(variable, 2)
 	net_pay = flt(slip.net_pay, 2)
-	if flt(fixed + variable, 2) != net_pay:
-		notes.append(
-			_(
-				"{0}: Salary Slip Net Pay is {1}. Fixed plus Variable on this file is {2}. "
-				"Deductions are not subtracted again."
-			).format(label, net_pay, flt(fixed + variable, 2))
-		)
+	entitled = flt(slip.gross_pay, 2)
 
+	if pay_earnings_total:
+		if flt(fixed + variable, 2) != net_pay:
+			notes.append(
+				_(
+					"{0}: Salary Slip Net Pay is {1}. Fixed plus Variable on this file is {2}. "
+					"Pay Earnings Total is set, so the gap stays on the file."
+				).format(label, net_pay, flt(fixed + variable, 2))
+			)
+	else:
+		fixed, variable, components, reduce_note = _reduce_to_net(fixed, variable, net_pay, components)
+		if reduce_note:
+			notes.append(_("{0}: {1}").format(label, reduce_note))
+		elif flt(fixed + variable, 2) != net_pay:
+			notes.append(
+				_(
+					"{0}: Salary Slip Net Pay is {1}. Fixed plus Variable on this file is {2}."
+				).format(label, net_pay, flt(fixed + variable, 2))
+			)
+
+	credit = flt(fixed + variable, 2)
 	return (
 		{
 			"employee": employee.name,
@@ -430,13 +617,15 @@ def _employee_snapshot(
 			"agent_routing_code": routing_codes.get(agent),
 			"employee_account_no": account_no,
 			"employee_iban": iban,
-			"pay_start_date": slip.start_date,
-			"pay_end_date": slip.end_date,
+			"pay_start_date": pay_start,
+			"pay_end_date": pay_end,
 			"days_in_period": days,
 			"unpaid_leave_days": flt(slip.leave_without_pay),
 			"fixed_amount": fixed,
 			"variable_amount": variable,
 			"net_pay": net_pay,
+			"entitled_amount": entitled,
+			"credit_amount": credit,
 			"salary_components": components,
 		},
 		notes,

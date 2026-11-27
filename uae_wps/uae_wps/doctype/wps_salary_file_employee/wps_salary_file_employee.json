@@ -37,6 +37,8 @@
   "fixed_amount",
   "variable_amount",
   "net_pay",
+  "entitled_amount",
+  "credit_amount",
   "components_section",
   "salary_components"
  ],
@@ -175,6 +177,20 @@
    "fieldtype": "Table",
    "label": "Salary Components",
    "options": "WPS Salary Component Detail"
+  },
+  {
+   "fieldname": "entitled_amount",
+   "fieldtype": "Currency",
+   "label": "Entitled Amount",
+   "options": "currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "credit_amount",
+   "fieldtype": "Currency",
+   "label": "Credit Amount",
+   "options": "currency",
+   "read_only": 1
   }
  ]
 }

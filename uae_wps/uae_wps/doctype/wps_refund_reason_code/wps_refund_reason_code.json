@@ -1,0 +1,36 @@
+{
+ "actions": [],
+ "creation": "2026-11-28 01:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "links": [],
+ "modified": "2026-11-28 01:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "UAE WPS",
+ "owner": "Administrator",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "name": "WPS Refund Reason Code",
+ "istable": 1,
+ "editable_grid": 1,
+ "permissions": [],
+ "field_order": ["code", "label"],
+ "fields": [
+  {
+   "fieldname": "code",
+   "fieldtype": "Data",
+   "label": "Code",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "Three digit refund request code from the agent's guide."
+  },
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "label": "Label",
+   "reqd": 1,
+   "in_list_view": 1
+  }
+ ]
+}

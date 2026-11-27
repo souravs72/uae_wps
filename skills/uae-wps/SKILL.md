@@ -22,7 +22,7 @@ Wage Protection System work in this app is a snapshot of a submitted HRMS payrol
 - Do not treat a mismatch between fixed plus variable and net pay as a failure. It is a note.
 - Do not invent or paste SIF lines. Call `generate_sif` on the saved WPS Salary File, or `generate_wps_sif` when you are the UAE WPS agent. Both write the Ministry of Labour file: EDR, EVP only when the selected format supports it, then SCR. If generation refuses, report the message and stop.
 - Do not guess a bank routing code. It lives on WPS Agent and is nine digits.
-- Do not fetch a file whose status is Generated, Downloaded, Submitted, Accepted, or Rejected.
+- Do not fetch a file whose status is Generated, Sent to Bank, Accepted, or Rejected.
 
 ## Before a fetch can succeed
 
