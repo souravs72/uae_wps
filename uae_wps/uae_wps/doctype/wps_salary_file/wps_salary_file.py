@@ -56,6 +56,10 @@ class WPSSalaryFile(Document):
 		removed = [name for name in (self.flags.previous_employee_names or []) if name not in current]
 		delete_component_rows(removed)
 
+	def before_submit(self):
+		if not self.sif_file:
+			frappe.throw(_("Generate the SIF file before submitting this WPS Salary File."))
+
 	def on_trash(self):
 		from uae_wps.payroll import delete_component_rows
 
@@ -86,10 +90,12 @@ class WPSSalaryFile(Document):
 	@frappe.whitelist(methods=["POST"])
 	def generate_sif(self) -> dict:
 		self.check_permission("write")
+		self.check_permission("submit")
 		if self.is_new():
 			frappe.throw(_("Save the WPS Salary File before generating the SIF file."))
 		self.load_from_db()
 		self.check_permission("write")
+		self.check_permission("submit")
 		if self.status in LOCKED_STATUSES:
 			frappe.throw(
 				_("This WPS Salary File is {0} and its SIF file cannot be generated again.").format(self.status)
@@ -108,7 +114,7 @@ class WPSSalaryFile(Document):
 		self.generated_by = frappe.session.user
 		self.flags.wps_generating = True
 		try:
-			self.save()
+			self.submit()
 		except Exception:
 			frappe.delete_doc("File", file_doc.name, ignore_permissions=True, force=True)
 			raise

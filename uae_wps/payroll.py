@@ -304,7 +304,17 @@ def _salary_details(slip_names: list[str]) -> dict[str, list[dict]]:
 	rows = frappe.get_all(
 		"Salary Detail",
 		filters={"parent": ["in", slip_names], "parenttype": "Salary Slip"},
-		fields=["parent", "parentfield", "salary_component", "amount", "idx"],
+		fields=[
+			"parent",
+			"parentfield",
+			"salary_component",
+			"amount",
+			"idx",
+			"depends_on_payment_days",
+			"do_not_include_in_total",
+			"statistical_component",
+			"additional_salary",
+		],
 		order_by="idx asc",
 	)
 	grouped: dict[str, list[dict]] = defaultdict(list)
@@ -329,6 +339,26 @@ def _component_categories(details: dict[str, list[dict]]) -> dict[str, str]:
 	return {row.name: row for row in rows}
 
 
+def _category_for_detail(detail, explicit: str) -> tuple[str, str]:
+	"""Use the WPS category when it is set. Otherwise follow the salary slip row.
+
+	HRMS gross pay is the earnings, after payment-day proration, excluding rows
+	marked out of the total. Additional Salary and earnings that are not prorated
+	are the variable part. An explicit category replaces that reading.
+	"""
+	if explicit in COMPONENT_CATEGORIES:
+		return explicit, ""
+	if cint(detail.get("do_not_include_in_total")) or cint(detail.get("statistical_component")):
+		return "Excluded", _("the salary slip keeps it out of the total")
+	if detail.parentfield != CREDIT_PARENTFIELD:
+		return "Excluded", _("it is not an earning")
+	if detail.get("additional_salary"):
+		return "Variable", _("it comes from an Additional Salary")
+	if cint(detail.get("depends_on_payment_days")):
+		return "Fixed", _("the salary slip prorates it by payment days")
+	return "Variable", _("the salary slip does not prorate it by payment days")
+
+
 def _employee_snapshot(
 	slip, employee, account, routing_codes, detail_rows, categories
 ) -> tuple[dict, list[str]]:
@@ -350,21 +380,21 @@ def _employee_snapshot(
 	components = []
 	for detail in detail_rows:
 		info = categories.get(detail.salary_component)
-		category = (info.wps_salary_category if info else "") or ""
-		if category not in COMPONENT_CATEGORIES:
+		explicit = (info.wps_salary_category if info else "") or ""
+		category, reason = _category_for_detail(detail, explicit)
+		if reason:
 			notes.append(
-				_(
-					"{0}: Salary Component {1} has no WPS Salary Category, so it was left off the snapshot."
-				).format(label, detail.salary_component)
+				_("{0}: {1} has no WPS Salary Category. Counted as {2} because {3}.").format(
+					label, detail.salary_component, category, reason
+				)
 			)
-			continue
 
 		amount = flt(detail.amount, 2)
 		components.append(
 			{
 				"salary_component": detail.salary_component,
 				"component_type": category,
-				"evp_component": (info.wps_evp_component or "") if category == "Variable" else "",
+				"evp_component": (info.wps_evp_component or "") if info and category == "Variable" else "",
 				"amount": amount,
 			}
 		)
