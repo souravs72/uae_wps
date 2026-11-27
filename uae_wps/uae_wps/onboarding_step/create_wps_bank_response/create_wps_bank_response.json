@@ -1,0 +1,21 @@
+{
+ "action": "Create Entry",
+ "action_label": "Record Bank Response",
+ "creation": "2026-11-28 01:00:00.000000",
+ "description": "Record the ACK or NAK (and line-level failures) the agent returns for a salary file. Optional until the bank replies.",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-11-28 01:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "Create WPS Bank Response",
+ "owner": "Administrator",
+ "reference_document": "WPS Bank Response",
+ "show_form_tour": 0,
+ "show_full_form": 1,
+ "title": "Record a bank response (optional)",
+ "validate_action": 1
+}

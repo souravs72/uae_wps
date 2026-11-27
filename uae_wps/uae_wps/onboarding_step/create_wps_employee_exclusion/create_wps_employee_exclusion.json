@@ -1,0 +1,21 @@
+{
+ "action": "Create Entry",
+ "action_label": "Add Employee Exclusion",
+ "creation": "2026-11-28 01:00:00.000000",
+ "description": "Hold an eligible employee out of a pay period when they must not go on the SIF (for example a temporary stop). Optional until you need it.",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-11-28 01:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "Create WPS Employee Exclusion",
+ "owner": "Administrator",
+ "reference_document": "WPS Employee Exclusion",
+ "show_form_tour": 0,
+ "show_full_form": 1,
+ "title": "Exclude an employee (optional)",
+ "validate_action": 1
+}

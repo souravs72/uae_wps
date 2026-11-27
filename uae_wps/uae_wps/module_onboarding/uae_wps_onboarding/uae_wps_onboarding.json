@@ -1,0 +1,58 @@
+{
+ "allow_roles": [
+  {
+   "role": "HR Manager"
+  },
+  {
+   "role": "HR User"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "creation": "2026-11-28 01:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Module Onboarding",
+ "idx": 0,
+ "is_complete": 0,
+ "modified": "2026-11-28 01:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "UAE WPS",
+ "name": "UAE WPS Onboarding",
+ "owner": "Administrator",
+ "steps": [
+  {
+   "is_optional": 0,
+   "step": "Enable WPS on Company"
+  },
+  {
+   "is_optional": 0,
+   "step": "Create WPS Agent"
+  },
+  {
+   "is_optional": 0,
+   "step": "Create WPS File Format"
+  },
+  {
+   "is_optional": 0,
+   "step": "Mark Employees for WPS"
+  },
+  {
+   "is_optional": 1,
+   "step": "Create WPS Employee Exclusion"
+  },
+  {
+   "is_optional": 0,
+   "step": "Create WPS Salary File"
+  },
+  {
+   "is_optional": 1,
+   "step": "Create WPS Bank Response"
+  },
+  {
+   "is_optional": 1,
+   "step": "Create WPS Refund Request"
+  }
+ ],
+ "title": "Submit wages through WPS"
+}
