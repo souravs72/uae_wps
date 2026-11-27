@@ -98,7 +98,7 @@ def get_custom_fields():
 				"label": "WPS Salary Category",
 				"options": "\nFixed\nVariable\nExcluded",
 				"insert_after": "type",
-				"description": "How this component is grouped on the WPS salary file. Excluded components are stored on the file and left out of the fixed and variable totals.",
+				"description": "Leave blank to follow the salary slip: payment-day earnings are Fixed, other earnings and Additional Salary are Variable, and rows kept out of the slip total are Excluded. A value here replaces that.",
 				"module": MODULE,
 			},
 			{

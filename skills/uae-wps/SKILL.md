@@ -17,7 +17,7 @@ Wage Protection System work in this app is a snapshot of a submitted HRMS payrol
 ## What you must not do
 
 - Do not change a Salary Slip, Payroll Entry, or Salary Component.
-- Do not invent Fixed, Variable, or Excluded. A component with a blank WPS category is left out of the snapshot and mentioned in the notes.
+- Do not invent Fixed, Variable, or Excluded. When WPS Salary Category is blank, fetch follows the salary slip: an earning prorated by payment days is Fixed, an Additional Salary or an earning that is not prorated is Variable, and a row kept out of the slip total, or any deduction, is Excluded. An explicit category replaces that. The note says which one was used.
 - Do not add an earnings or deduction amount that the fetch did not copy. Fixed and variable credit totals come only from earnings. Deductions are stored and are not added to those totals.
 - Do not treat a mismatch between fixed plus variable and net pay as a failure. It is a note.
 - Do not invent or paste SIF lines. Call `generate_sif` on the saved WPS Salary File, or `generate_wps_sif` when you are the UAE WPS agent. Both write the Ministry of Labour file: EDR, EVP only when the selected format supports it, then SCR. If generation refuses, report the message and stop.

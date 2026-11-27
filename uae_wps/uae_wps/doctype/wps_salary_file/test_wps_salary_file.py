@@ -216,6 +216,7 @@ class TestWPSSalaryFile(IntegrationTestCase):
 		created = get_datetime(wps_file.generated_at)
 
 		self.assertEqual(wps_file.status, "Generated")
+		self.assertEqual(wps_file.docstatus, 1)
 		self.assertEqual(result["file_name"], wps_file.file_name)
 		self.assertEqual(wps_file.file_name, f"1234567890123{created.strftime('%y%m%d%H%M%S')}.SIF")
 		content = frappe.get_doc("File", {"file_url": wps_file.sif_file}).get_content()
@@ -248,6 +249,70 @@ class TestWPSSalaryFile(IntegrationTestCase):
 		self.assertEqual(scr[7], "1000.00")
 		self.assertEqual(scr[8], "AED")
 		self.assertRaises(frappe.ValidationError, wps_file.generate_sif)
+
+	def test_blank_category_follows_the_salary_slip(self):
+		company = _company()
+		employee = _employee(company, _agent(), eligible=1)
+		basic = _component("Earning", "")
+		bonus = _component("Earning", "")
+		loan = _component("Deduction", "")
+		payroll = _mark_submitted(
+			"Payroll Entry",
+			{
+				"doctype": "Payroll Entry",
+				"company": company,
+				"posting_date": "2026-06-30",
+				"start_date": "2026-06-01",
+				"end_date": "2026-06-30",
+				"currency": "AED",
+				"exchange_rate": 1,
+			},
+		)
+		_mark_submitted(
+			"Salary Slip",
+			{
+				"doctype": "Salary Slip",
+				"employee": employee,
+				"employee_name": frappe.db.get_value("Employee", employee, "employee_name"),
+				"company": company,
+				"payroll_entry": payroll,
+				"posting_date": "2026-06-30",
+				"start_date": "2026-06-01",
+				"end_date": "2026-06-30",
+				"currency": "AED",
+				"exchange_rate": 1,
+				"payroll_frequency": "Monthly",
+				"total_working_days": 30,
+				"payment_days": 30,
+				"net_pay": 1500,
+				"earnings": [
+					{"salary_component": basic, "amount": 1000, "depends_on_payment_days": 1},
+					{"salary_component": bonus, "amount": 500, "depends_on_payment_days": 0},
+				],
+				"deductions": [{"salary_component": loan, "amount": 100}],
+			},
+		)
+		wps_file = frappe.get_doc(
+			{
+				"doctype": "WPS Salary File",
+				"company": company,
+				"payroll_entry": payroll,
+				"salary_month": "2026-06-01",
+				"currency": "AED",
+			}
+		).insert()
+		wps_file.fetch_salary_slips()
+		wps_file.reload()
+		load_component_rows(wps_file)
+		self.assertEqual(wps_file.total_fixed_salary, 1000)
+		self.assertEqual(wps_file.total_variable_salary, 500)
+		self.assertEqual(wps_file.total_salary, 1500)
+		by_component = {row.salary_component: row.component_type for row in wps_file.employees[0].salary_components}
+		self.assertEqual(by_component[basic], "Fixed")
+		self.assertEqual(by_component[bonus], "Variable")
+		self.assertEqual(by_component[loan], "Excluded")
+		self.assertIn("payment days", wps_file.validation_summary)
+		self.assertRaises(frappe.ValidationError, wps_file.submit)
 
 	def test_generate_rejects_zero_salary(self):
 		wps_file = _prepare_sif(_fetched_file())
@@ -355,7 +420,7 @@ def _format(agent: str) -> str:
 	)
 
 
-def _component(component_type: str, category: str) -> str:
+def _component(component_type: str, category: str | None) -> str:
 	suffix = frappe.generate_hash(length=6)
 	name = f"WPS {component_type} {suffix}"
 	return (

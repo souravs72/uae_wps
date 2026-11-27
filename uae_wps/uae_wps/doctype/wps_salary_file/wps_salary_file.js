@@ -5,8 +5,13 @@ const LOCKED_STATUSES = ["Generated", "Downloaded", "Submitted", "Accepted", "Re
 
 frappe.ui.form.on("WPS Salary File", {
 	refresh(frm) {
-		if (frm.is_new()) return;
-		if (LOCKED_STATUSES.includes(frm.doc.status)) return;
+		if (frm.doc.validation_summary) {
+			frm.set_intro(
+				frappe.utils.escape_html(frm.doc.validation_summary).replaceAll("\n", "<br>"),
+				"yellow"
+			);
+		}
+		if (frm.is_new() || frm.doc.docstatus > 0 || LOCKED_STATUSES.includes(frm.doc.status)) return;
 
 		frm.add_custom_button(__("Fetch Salary Slips"), () => {
 			frm.call({
@@ -17,14 +22,19 @@ frappe.ui.form.on("WPS Salary File", {
 			}).then(() => frm.reload_doc());
 		});
 		frm.add_custom_button(__("Generate SIF File"), () => {
-			frm.save().then(() => {
+			const generate = () => {
 				frm.call({
 					doc: frm.doc,
 					method: "generate_sif",
 					freeze: true,
 					freeze_message: __("Generating the SIF file"),
 				}).then(() => frm.reload_doc());
-			});
+			};
+			if (frm.is_dirty()) {
+				frm.save().then(generate);
+				return;
+			}
+			generate();
 		}).addClass("btn-primary");
 	},
 });

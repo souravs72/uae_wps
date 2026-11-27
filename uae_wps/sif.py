@@ -149,7 +149,7 @@ def _employer_routing(doc, errors: list[str]) -> str:
 		errors.append(_("Set the WPS Agent before generating the SIF file."))
 		return ""
 	routing = frappe.db.get_value("WPS Agent", doc.wps_agent, "routing_code") or ""
-	if len(routing) != 9 or not str(routing).isdigit():
+	if len(str(routing)) != 9 or not str(routing).isdigit() or set(str(routing)) == {"0"}:
 		errors.append(
 			_("WPS Agent {0} needs the 9 digit routing code assigned by the Central Bank.").format(doc.wps_agent)
 		)
@@ -225,7 +225,7 @@ def _person_id(row, fmt, label: str, errors: list[str]) -> str:
 
 def _employee_routing(row, label: str, errors: list[str]) -> str:
 	routing = str(row.agent_routing_code or "").strip()
-	if len(routing) != 9 or not routing.isdigit():
+	if len(routing) != 9 or not routing.isdigit() or set(routing) == {"0"}:
 		errors.append(
 			_("{0} has no 9 digit agent routing code. Set the WPS Agent on the Employee and fetch again.").format(
 				label
