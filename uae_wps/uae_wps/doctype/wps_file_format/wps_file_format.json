@@ -1,0 +1,202 @@
+{
+ "actions": [],
+ "creation": "2026-11-23 13:59:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "links": [],
+ "modified": "2026-11-23 13:59:00.000000",
+ "modified_by": "Administrator",
+ "module": "UAE WPS",
+ "owner": "Administrator",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "name": "WPS File Format",
+ "autoname": "field:format_name",
+ "title_field": "format_name",
+ "search_fields": "wps_agent,format_version",
+ "allow_rename": 1,
+ "field_order": [
+  "format_name",
+  "wps_agent",
+  "format_version",
+  "is_active",
+  "column_break_main",
+  "salary_month_format",
+  "supports_evp",
+  "requires_encryption",
+  "lengths_section",
+  "employee_id_min_length",
+  "employee_id_max_length",
+  "employer_id_length",
+  "column_break_lengths",
+  "employee_account_min_length",
+  "employee_account_max_length",
+  "layout_section",
+  "field_delimiter",
+  "date_format",
+  "decimal_precision"
+ ],
+ "fields": [
+  {
+   "fieldname": "format_name",
+   "fieldtype": "Data",
+   "label": "Format Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "wps_agent",
+   "fieldtype": "Link",
+   "label": "WPS Agent",
+   "options": "WPS Agent",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "format_version",
+   "fieldtype": "Data",
+   "label": "Format Version"
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "MMYYYY",
+   "fieldname": "salary_month_format",
+   "fieldtype": "Select",
+   "label": "Salary Month Format",
+   "options": "MMYYYY\nMM-YYYY",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "supports_evp",
+   "fieldtype": "Check",
+   "label": "Supports EVP",
+   "description": "When set, variable pay is also written as a separate EVP record. It is not added again on top of the EDR variable amount."
+  },
+  {
+   "default": "0",
+   "fieldname": "requires_encryption",
+   "fieldtype": "Check",
+   "label": "Requires Encryption"
+  },
+  {
+   "fieldname": "lengths_section",
+   "fieldtype": "Section Break",
+   "label": "Field Lengths"
+  },
+  {
+   "default": "14",
+   "fieldname": "employee_id_min_length",
+   "fieldtype": "Int",
+   "label": "Employee ID Min Length",
+   "non_negative": 1
+  },
+  {
+   "default": "35",
+   "fieldname": "employee_id_max_length",
+   "fieldtype": "Int",
+   "label": "Employee ID Max Length",
+   "non_negative": 1
+  },
+  {
+   "default": "13",
+   "fieldname": "employer_id_length",
+   "fieldtype": "Int",
+   "label": "Employer ID Length",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "column_break_lengths",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "employee_account_min_length",
+   "fieldtype": "Int",
+   "label": "Employee Account Min Length",
+   "non_negative": 1
+  },
+  {
+   "default": "23",
+   "fieldname": "employee_account_max_length",
+   "fieldtype": "Int",
+   "label": "Employee Account Max Length",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "layout_section",
+   "fieldtype": "Section Break",
+   "label": "Layout"
+  },
+  {
+   "default": ",",
+   "fieldname": "field_delimiter",
+   "fieldtype": "Data",
+   "label": "Field Delimiter"
+  },
+  {
+   "default": "YYYY-MM-DD",
+   "fieldname": "date_format",
+   "fieldtype": "Data",
+   "label": "Date Format"
+  },
+  {
+   "default": "2",
+   "fieldname": "decimal_precision",
+   "fieldtype": "Int",
+   "label": "Decimal Precision",
+   "non_negative": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "HR Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "HR User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  }
+ ]
+}

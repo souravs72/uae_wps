@@ -1,0 +1,273 @@
+{
+ "actions": [],
+ "creation": "2026-11-23 13:59:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "links": [],
+ "modified": "2026-11-23 13:59:00.000000",
+ "modified_by": "Administrator",
+ "module": "UAE WPS",
+ "owner": "Administrator",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "name": "WPS Salary File",
+ "autoname": "naming_series:",
+ "naming_rule": "By \"Naming Series\" field",
+ "title_field": "company",
+ "search_fields": "payroll_entry,status,salary_month",
+ "track_changes": 1,
+ "allow_rename": 0,
+ "field_order": [
+  "naming_series",
+  "company",
+  "payroll_entry",
+  "salary_month",
+  "column_break_payroll",
+  "currency",
+  "status",
+  "bank_section",
+  "employer_bank_account",
+  "wps_agent",
+  "wps_file_format",
+  "summary_section",
+  "total_employees",
+  "total_fixed_salary",
+  "column_break_summary",
+  "total_variable_salary",
+  "total_salary",
+  "file_section",
+  "sif_file",
+  "file_name",
+  "file_hash",
+  "column_break_file",
+  "generated_at",
+  "generated_by",
+  "validation_summary",
+  "employees_section",
+  "employees"
+ ],
+ "fields": [
+  {
+   "default": "WPS-.YYYY.-.#####",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "WPS-.YYYY.-.#####",
+   "reqd": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "payroll_entry",
+   "fieldtype": "Link",
+   "label": "Payroll Entry",
+   "options": "Payroll Entry",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "salary_month",
+   "fieldtype": "Date",
+   "label": "Salary Month",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_payroll",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "company.default_currency",
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency",
+   "reqd": 1
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nValidated\nGenerated\nDownloaded\nSubmitted\nAccepted\nRejected",
+   "read_only": 1,
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "bank_section",
+   "fieldtype": "Section Break",
+   "label": "Bank Information"
+  },
+  {
+   "fetch_from": "payroll_entry.bank_account",
+   "fieldname": "employer_bank_account",
+   "fieldtype": "Link",
+   "label": "Employer Bank Account",
+   "options": "Bank Account",
+   "description": "Filled from the Payroll Entry when Fetch Salary Slips runs and this is empty. Required before a SIF file is generated."
+  },
+  {
+   "fetch_from": "employer_bank_account.wps_agent",
+   "fieldname": "wps_agent",
+   "fieldtype": "Link",
+   "label": "WPS Agent",
+   "options": "WPS Agent",
+   "description": "Filled from the employer Bank Account when Fetch Salary Slips runs and this is empty."
+  },
+  {
+   "fieldname": "wps_file_format",
+   "fieldtype": "Link",
+   "label": "WPS File Format",
+   "options": "WPS File Format",
+   "description": "Bank file rules. Chosen before generation, not required to fetch the salary snapshot."
+  },
+  {
+   "fieldname": "summary_section",
+   "fieldtype": "Section Break",
+   "label": "Salary Summary"
+  },
+  {
+   "fieldname": "total_employees",
+   "fieldtype": "Int",
+   "label": "Total Employees",
+   "non_negative": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_fixed_salary",
+   "fieldtype": "Currency",
+   "label": "Total Fixed Salary",
+   "options": "currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_summary",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_variable_salary",
+   "fieldtype": "Currency",
+   "label": "Total Variable Salary",
+   "options": "currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_salary",
+   "fieldtype": "Currency",
+   "label": "Total Salary",
+   "options": "currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "file_section",
+   "fieldtype": "Section Break",
+   "label": "File Information"
+  },
+  {
+   "fieldname": "sif_file",
+   "fieldtype": "Attach",
+   "label": "SIF File",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "file_name",
+   "fieldtype": "Data",
+   "label": "File Name",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "file_hash",
+   "fieldtype": "Data",
+   "label": "File Hash",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "column_break_file",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "generated_at",
+   "fieldtype": "Datetime",
+   "label": "Generated At",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "generated_by",
+   "fieldtype": "Link",
+   "label": "Generated By",
+   "options": "User",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "validation_summary",
+   "fieldtype": "Small Text",
+   "label": "Validation Summary",
+   "read_only": 1
+  },
+  {
+   "fieldname": "employees_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Details"
+  },
+  {
+   "fieldname": "employees",
+   "fieldtype": "Table",
+   "label": "Employees",
+   "options": "WPS Salary File Employee"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "HR Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "HR User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  }
+ ]
+}

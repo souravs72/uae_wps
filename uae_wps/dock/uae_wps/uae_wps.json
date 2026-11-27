@@ -1,0 +1,23 @@
+{
+ "app": "uae_wps",
+ "creation": "2026-11-23 14:20:00.000000",
+ "docstatus": 0,
+ "doctype": "Dock",
+ "idx": 0,
+ "items": [
+  {
+   "added": 0,
+   "hidden": 0,
+   "icon": "landmark",
+   "link_to": "UAE WPS",
+   "link_type": "Sidebar",
+   "title": "UAE WPS"
+  }
+ ],
+ "modified": "2026-11-23 14:20:00.000000",
+ "modified_by": "Administrator",
+ "name": "uae_wps",
+ "owner": "Administrator",
+ "standard": 1,
+ "user": ""
+}
