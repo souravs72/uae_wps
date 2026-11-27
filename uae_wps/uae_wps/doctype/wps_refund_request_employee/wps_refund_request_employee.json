@@ -1,0 +1,88 @@
+{
+ "actions": [],
+ "creation": "2026-11-28 01:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "links": [],
+ "modified": "2026-11-28 01:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "UAE WPS",
+ "owner": "Administrator",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "name": "WPS Refund Request Employee",
+ "istable": 1,
+ "editable_grid": 1,
+ "permissions": [],
+ "field_order": [
+  "employee",
+  "employee_name",
+  "mohre_person_id",
+  "agent_routing_code",
+  "employee_account",
+  "refund_amount",
+  "refund_reason_code",
+  "max_refund_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "mohre_person_id",
+   "fieldtype": "Data",
+   "label": "MOHRE Person ID",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "agent_routing_code",
+   "fieldtype": "Data",
+   "label": "Agent Routing Code",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee_account",
+   "fieldtype": "Data",
+   "label": "Employee Account",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "refund_amount",
+   "fieldtype": "Currency",
+   "label": "Refund Amount",
+   "options": "currency",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "refund_reason_code",
+   "fieldtype": "Data",
+   "label": "Refund Reason Code",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "max_refund_amount",
+   "fieldtype": "Currency",
+   "label": "Max Refund Amount",
+   "options": "currency",
+   "read_only": 1
+  }
+ ]
+}

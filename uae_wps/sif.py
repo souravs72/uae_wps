@@ -76,6 +76,7 @@ def generate_sif_content(doc) -> tuple[bytes, str, datetime]:
 		period = _period(doc, row, label, errors)
 		fixed, variable = _amounts(row, precision, label, errors)
 		leave_days = _leave_days(row, period, label, errors)
+		_credit_matches_net(doc, row, fixed, variable, precision, label, errors)
 		if (
 			not person_id
 			or not routing
@@ -101,8 +102,16 @@ def generate_sif_content(doc) -> tuple[bytes, str, datetime]:
 			str(leave_days),
 		]
 		lines = [_join(edr, label, errors)]
-		if fmt and cint(fmt.supports_evp) and variable:
-			lines.append(_evp_line(row, person_id, routing, variable, precision, label, errors))
+		if variable:
+			if fmt and cint(fmt.supports_evp):
+				lines.append(_evp_line(row, person_id, routing, variable, precision, label, errors))
+			elif fmt and not cint(fmt.supports_evp):
+				errors.append(
+					_(
+						"{0} has variable pay {1}, and WPS File Format {2} does not write an EVP record. "
+						"Dubai Islamic Bank and Emirates Islamic require that line."
+					).format(label, _money(variable, precision), fmt.name)
+				)
 		edr_rows.append("\r\n".join(line for line in lines if line))
 
 	salary_month = _salary_month(doc, fmt, errors)
@@ -317,6 +326,21 @@ def _amounts(row, precision: int, label: str, errors: list[str]):
 		errors.append(_("{0}: a salary amount is longer than 15 characters.").format(label))
 		return None, None
 	return fixed, variable
+
+
+def _credit_matches_net(doc, row, fixed, variable, precision: int, label: str, errors: list[str]) -> None:
+	if fixed is None or variable is None:
+		return
+	if cint(doc.pay_earnings_total):
+		return
+	net_pay = flt(row.net_pay, precision)
+	if flt(fixed + variable, precision) != net_pay:
+		errors.append(
+			_(
+				"{0}: fixed plus variable is {1} and Net Pay is {2}. "
+				"Fetch again, or set Pay Earnings Total on the file."
+			).format(label, _money(flt(fixed + variable, precision), precision), _money(net_pay, precision))
+		)
 
 
 def _leave_days(row, period, label: str, errors: list[str]) -> int | None:

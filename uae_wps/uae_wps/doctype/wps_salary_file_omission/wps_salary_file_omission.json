@@ -1,0 +1,64 @@
+{
+ "actions": [],
+ "creation": "2026-11-28 01:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "links": [],
+ "modified": "2026-11-28 01:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "UAE WPS",
+ "owner": "Administrator",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "name": "WPS Salary File Omission",
+ "istable": 1,
+ "editable_grid": 1,
+ "permissions": [],
+ "field_order": [
+  "employee",
+  "employee_name",
+  "salary_slip",
+  "reason",
+  "entitled_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "salary_slip",
+   "fieldtype": "Link",
+   "label": "Salary Slip",
+   "options": "Salary Slip",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Data",
+   "label": "Reason",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "entitled_amount",
+   "fieldtype": "Currency",
+   "label": "Entitled Amount",
+   "options": "currency",
+   "in_list_view": 1,
+   "read_only": 1
+  }
+ ]
+}

@@ -35,7 +35,9 @@
   "layout_section",
   "field_delimiter",
   "date_format",
-  "decimal_precision"
+  "decimal_precision",
+  "refund_codes_section",
+  "refund_reason_codes"
  ],
  "fields": [
   {
@@ -160,6 +162,17 @@
    "fieldtype": "Int",
    "label": "Decimal Precision",
    "non_negative": 1
+  },
+  {
+   "fieldname": "refund_codes_section",
+   "fieldtype": "Section Break",
+   "label": "Refund Reason Codes"
+  },
+  {
+   "fieldname": "refund_reason_codes",
+   "fieldtype": "Table",
+   "label": "Refund Reason Codes",
+   "options": "WPS Refund Reason Code"
   }
  ],
  "permissions": [

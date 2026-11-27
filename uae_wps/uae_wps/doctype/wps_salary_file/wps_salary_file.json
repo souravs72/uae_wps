@@ -27,6 +27,7 @@
   "column_break_payroll",
   "currency",
   "status",
+  "pay_earnings_total",
   "bank_section",
   "employer_bank_account",
   "wps_agent",
@@ -37,6 +38,17 @@
   "column_break_summary",
   "total_variable_salary",
   "total_salary",
+  "compliance_section",
+  "due_date",
+  "wages_due",
+  "wages_in_file",
+  "column_break_compliance",
+  "percent_of_wages_due",
+  "employees_below_85",
+  "payment_status",
+  "bank_response",
+  "ack_file_name",
+  "accepted_on",
   "file_section",
   "sif_file",
   "file_name",
@@ -46,7 +58,10 @@
   "generated_by",
   "validation_summary",
   "employees_section",
-  "employees"
+  "employees",
+  "omissions_section",
+  "omissions",
+  "amended_from"
  ],
  "fields": [
   {
@@ -100,12 +115,13 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nValidated\nGenerated\nDownloaded\nSubmitted\nAccepted\nRejected",
+   "options": "Draft\nValidated\nGenerated\nSent to Bank\nAccepted\nRejected",
    "read_only": 1,
    "reqd": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "no_copy": 1
+   "no_copy": 1,
+   "allow_on_submit": 1
   },
   {
    "fieldname": "bank_section",
@@ -181,7 +197,8 @@
    "fieldname": "sif_file",
    "fieldtype": "Attach",
    "label": "SIF File",
-   "no_copy": 1
+   "no_copy": 1,
+   "read_only": 1
   },
   {
    "fieldname": "file_name",
@@ -232,6 +249,108 @@
    "fieldtype": "Table",
    "label": "Employees",
    "options": "WPS Salary File Employee"
+  },
+  {
+   "default": "0",
+   "fieldname": "pay_earnings_total",
+   "fieldtype": "Check",
+   "label": "Pay Earnings Total",
+   "description": "When set, the SIF keeps the earnings totals even when they differ from Net Pay. Leave unset so the credit equals Net Pay."
+  },
+  {
+   "fieldname": "compliance_section",
+   "fieldtype": "Section Break",
+   "label": "Wage Protection"
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "label": "Due Date",
+   "read_only": 1,
+   "description": "First day of the month after the salary month."
+  },
+  {
+   "fieldname": "wages_due",
+   "fieldtype": "Currency",
+   "label": "Wages Due",
+   "options": "currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "wages_in_file",
+   "fieldtype": "Currency",
+   "label": "Wages In File",
+   "options": "currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_compliance",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "percent_of_wages_due",
+   "fieldtype": "Percent",
+   "label": "Percent Of Wages Due",
+   "read_only": 1
+  },
+  {
+   "fieldname": "employees_below_85",
+   "fieldtype": "Int",
+   "label": "Employees Below 85 Percent",
+   "read_only": 1,
+   "non_negative": 1
+  },
+  {
+   "fieldname": "payment_status",
+   "fieldtype": "Data",
+   "label": "Payment Status",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "bank_response",
+   "fieldtype": "Link",
+   "label": "Bank Response",
+   "options": "WPS Bank Response",
+   "read_only": 1,
+   "allow_on_submit": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "ack_file_name",
+   "fieldtype": "Data",
+   "label": "ACK File Name",
+   "read_only": 1,
+   "allow_on_submit": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "accepted_on",
+   "fieldtype": "Date",
+   "label": "Accepted On",
+   "read_only": 1,
+   "allow_on_submit": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "omissions_section",
+   "fieldtype": "Section Break",
+   "label": "Omitted Employees"
+  },
+  {
+   "fieldname": "omissions",
+   "fieldtype": "Table",
+   "label": "Omissions",
+   "options": "WPS Salary File Omission"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "WPS Salary File",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "permissions": [
@@ -247,7 +366,8 @@
    "email": 1,
    "share": 1,
    "submit": 1,
-   "cancel": 1
+   "cancel": 1,
+   "amend": 1
   },
   {
    "role": "HR Manager",
@@ -261,7 +381,8 @@
    "email": 1,
    "share": 1,
    "submit": 1,
-   "cancel": 1
+   "cancel": 1,
+   "amend": 1
   },
   {
    "role": "HR User",
@@ -275,5 +396,6 @@
    "share": 1,
    "submit": 1
   }
- ]
+ ],
+ "is_amendable": 1
 }
