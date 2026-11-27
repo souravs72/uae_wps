@@ -1,0 +1,77 @@
+{
+ "app": "uae_wps",
+ "charts": [],
+ "content": "[{\"id\":\"wps_header\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>UAE WPS</b></span>\",\"col\":12}},{\"id\":\"wps_files\",\"type\":\"card\",\"data\":{\"card_name\":\"Salary Files\",\"col\":4}},{\"id\":\"wps_setup\",\"type\":\"card\",\"data\":{\"card_name\":\"Setup\",\"col\":4}}]",
+ "creation": "2026-11-23 14:20:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "landmark",
+ "idx": 1,
+ "is_hidden": 0,
+ "label": "UAE WPS",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Salary Files",
+   "link_count": 1,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WPS Salary File",
+   "link_count": 0,
+   "link_to": "WPS Salary File",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Setup",
+   "link_count": 2,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WPS Agent",
+   "link_count": 0,
+   "link_to": "WPS Agent",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WPS File Format",
+   "link_count": 0,
+   "link_to": "WPS File Format",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-11-23 14:20:00.000000",
+ "modified_by": "Administrator",
+ "module": "UAE WPS",
+ "name": "UAE WPS",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 3.0,
+ "shortcuts": [],
+ "title": "UAE WPS",
+ "type": "Workspace"
+}

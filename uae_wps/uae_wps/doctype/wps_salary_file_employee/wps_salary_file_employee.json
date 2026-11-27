@@ -1,0 +1,180 @@
+{
+ "actions": [],
+ "creation": "2026-11-23 13:59:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "links": [],
+ "modified": "2026-11-23 13:59:00.000000",
+ "modified_by": "Administrator",
+ "module": "UAE WPS",
+ "owner": "Administrator",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "name": "WPS Salary File Employee",
+ "istable": 1,
+ "editable_grid": 1,
+ "permissions": [],
+ "field_order": [
+  "employee",
+  "employee_name",
+  "salary_slip",
+  "column_break_employee",
+  "currency",
+  "identification_section",
+  "mohre_person_id",
+  "agent_routing_code",
+  "column_break_identification",
+  "employee_account_no",
+  "employee_iban",
+  "period_section",
+  "pay_start_date",
+  "pay_end_date",
+  "column_break_period",
+  "days_in_period",
+  "unpaid_leave_days",
+  "amounts_section",
+  "fixed_amount",
+  "variable_amount",
+  "net_pay",
+  "components_section",
+  "salary_components"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "salary_slip",
+   "fieldtype": "Link",
+   "label": "Salary Slip",
+   "options": "Salary Slip",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_employee",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "identification_section",
+   "fieldtype": "Section Break",
+   "label": "WPS Identification",
+   "description": "Copied when the file is generated. Later changes on Employee do not rewrite this row."
+  },
+  {
+   "fetch_from": "employee.mohre_person_id",
+   "fieldname": "mohre_person_id",
+   "fieldtype": "Data",
+   "label": "MOHRE Person ID"
+  },
+  {
+   "fieldname": "agent_routing_code",
+   "fieldtype": "Data",
+   "label": "Agent Routing Code"
+  },
+  {
+   "fieldname": "column_break_identification",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.bank_ac_no",
+   "fieldname": "employee_account_no",
+   "fieldtype": "Data",
+   "label": "Account Number"
+  },
+  {
+   "fetch_from": "employee.iban",
+   "fieldname": "employee_iban",
+   "fieldtype": "Data",
+   "label": "Employee IBAN",
+   "options": "IBAN"
+  },
+  {
+   "fieldname": "period_section",
+   "fieldtype": "Section Break",
+   "label": "Salary Period"
+  },
+  {
+   "fieldname": "pay_start_date",
+   "fieldtype": "Date",
+   "label": "Pay Start Date"
+  },
+  {
+   "fieldname": "pay_end_date",
+   "fieldtype": "Date",
+   "label": "Pay End Date"
+  },
+  {
+   "fieldname": "column_break_period",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "days_in_period",
+   "fieldtype": "Int",
+   "label": "Days In Period",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "unpaid_leave_days",
+   "fieldtype": "Float",
+   "label": "Unpaid Leave Days",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "amounts_section",
+   "fieldtype": "Section Break",
+   "label": "Salary Amounts"
+  },
+  {
+   "fieldname": "fixed_amount",
+   "fieldtype": "Currency",
+   "label": "Fixed Amount",
+   "options": "currency",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "variable_amount",
+   "fieldtype": "Currency",
+   "label": "Variable Amount",
+   "options": "currency",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "net_pay",
+   "fieldtype": "Currency",
+   "label": "Net Pay",
+   "options": "currency",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "components_section",
+   "fieldtype": "Section Break",
+   "label": "Salary Component Details"
+  },
+  {
+   "fieldname": "salary_components",
+   "fieldtype": "Table",
+   "label": "Salary Components",
+   "options": "WPS Salary Component Detail"
+  }
+ ]
+}

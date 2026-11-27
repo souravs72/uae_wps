@@ -8,18 +8,26 @@ app_license = "mit"
 # Apps
 # ------------------
 
-# required_apps = []
+required_apps = ["frappe/hrms"]
 
-# Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "uae_wps",
-# 		"logo": "/assets/uae_wps/logo.png",
-# 		"title": "UAE WPS",
-# 		"route": "/uae_wps",
-# 		"has_permission": "uae_wps.api.permission.has_app_permission",
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "uae_wps",
+		"logo": "/assets/uae_wps/logo.svg",
+		"title": "UAE WPS",
+		"route": "/desk/uae-wps",
+		"has_permission": "uae_wps.permissions.has_app_permission",
+		"sequence_id": 3,
+	}
+]
+
+# The built-in assistant loads skills/uae-wps. These tools are how Flow may read or
+# refresh a WPS Salary File. Payroll amounts and the SIF file stay in Python.
+flow_tools = [
+	"uae_wps.ai.wps_file_summary",
+	"uae_wps.ai.fetch_wps_salary_slips",
+]
+flow_agents = ["uae_wps.ai.agents"]
 
 # The dock, the rail down the left of the desk, is a document rather than a hook. Author it in
 # Manage Dock on a developer-mode site and press Export to App, and it is written to
@@ -96,7 +104,7 @@ app_license = "mit"
 # ------------
 
 # before_install = "uae_wps.install.before_install"
-# after_install = "uae_wps.install.after_install"
+after_install = "uae_wps.install.after_install"
 
 # Uninstallation
 # ------------

@@ -1,0 +1,117 @@
+{
+ "actions": [],
+ "creation": "2026-11-23 13:59:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "links": [],
+ "modified": "2026-11-23 13:59:00.000000",
+ "modified_by": "Administrator",
+ "module": "UAE WPS",
+ "owner": "Administrator",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "name": "WPS Agent",
+ "autoname": "field:agent_name",
+ "title_field": "agent_name",
+ "search_fields": "agent_code,routing_code,agent_type",
+ "allow_rename": 1,
+ "field_order": [
+  "agent_name",
+  "agent_code",
+  "agent_type",
+  "column_break_main",
+  "routing_code",
+  "supports_wps",
+  "is_active"
+ ],
+ "fields": [
+  {
+   "fieldname": "agent_name",
+   "fieldtype": "Data",
+   "label": "Agent Name",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "agent_code",
+   "fieldtype": "Data",
+   "label": "Agent Code",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "agent_type",
+   "fieldtype": "Select",
+   "label": "Agent Type",
+   "options": "Bank\nExchange House",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "routing_code",
+   "fieldtype": "Data",
+   "label": "Routing Code",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1,
+   "description": "9 digit head-office routing code assigned by the Central Bank. Stored as text because it is an identifier."
+  },
+  {
+   "default": "1",
+   "fieldname": "supports_wps",
+   "fieldtype": "Check",
+   "label": "Supports WPS"
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "HR Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "HR User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  }
+ ]
+}
