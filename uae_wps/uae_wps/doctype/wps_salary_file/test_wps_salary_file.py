@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.tests import IntegrationTestCase
-from frappe.utils import flt
+from frappe.utils import flt, get_datetime
 
 from uae_wps.payroll import load_component_rows
 
@@ -209,6 +209,56 @@ class TestWPSSalaryFile(IntegrationTestCase):
 		first.fetch_salary_slips()
 		self.assertEqual(frappe.db.count("WPS Salary Component Detail", {"parent": victim}), before)
 
+	def test_generate_sif_writes_edr_and_scr(self):
+		wps_file = _prepare_sif(_fetched_file())
+		result = wps_file.generate_sif()
+		wps_file.reload()
+		created = get_datetime(wps_file.generated_at)
+
+		self.assertEqual(wps_file.status, "Generated")
+		self.assertEqual(result["file_name"], wps_file.file_name)
+		self.assertEqual(wps_file.file_name, f"1234567890123{created.strftime('%y%m%d%H%M%S')}.SIF")
+		content = frappe.get_doc("File", {"file_url": wps_file.sif_file}).get_content()
+		text = content.decode("ascii") if isinstance(content, bytes) else content
+		lines = text.split("\r\n")
+		self.assertEqual(lines[-1], "")
+		edr, scr = lines[0].split(","), lines[1].split(",")
+		self.assertEqual(
+			edr,
+			[
+				"EDR",
+				"12345678901234",
+				"302620122",
+				"AE070331234567890123456",
+				"2026-05-01",
+				"2026-05-31",
+				"31",
+				"1000.00",
+				"0.00",
+				"0",
+			],
+		)
+		self.assertEqual(scr[0], "SCR")
+		self.assertEqual(scr[1], "1234567890123")
+		self.assertEqual(scr[2], "302620122")
+		self.assertEqual(scr[3], created.strftime("%Y-%m-%d"))
+		self.assertEqual(scr[4], created.strftime("%H%M"))
+		self.assertEqual(scr[5], "052026")
+		self.assertEqual(scr[6], "1")
+		self.assertEqual(scr[7], "1000.00")
+		self.assertEqual(scr[8], "AED")
+		self.assertRaises(frappe.ValidationError, wps_file.generate_sif)
+
+	def test_generate_rejects_zero_salary(self):
+		wps_file = _prepare_sif(_fetched_file())
+		wps_file.employees[0].fixed_amount = 0
+		wps_file.employees[0].variable_amount = 0
+		wps_file.save()
+		self.assertRaises(frappe.ValidationError, wps_file.generate_sif)
+		wps_file.reload()
+		self.assertEqual(wps_file.status, "Draft")
+		self.assertFalse(wps_file.sif_file)
+
 
 def _company() -> str:
 	company = frappe.db.get_value("Company", {}, "name")
@@ -276,6 +326,33 @@ def _employee(company: str, agent: str | None, eligible: int) -> str:
 	)
 	employee.insert(ignore_permissions=True)
 	return employee.name
+
+
+def _prepare_sif(wps_file):
+	frappe.db.set_value("Company", wps_file.company, "mohre_establishment_id", "1234567890123")
+	agent = _agent()
+	wps_file.wps_agent = agent
+	wps_file.wps_file_format = _format(agent)
+	wps_file.currency = "AED"
+	wps_file.save()
+	frappe.db.set_value("WPS Salary File", wps_file.name, "currency", "AED")
+	wps_file.reload()
+	return wps_file
+
+
+def _format(agent: str) -> str:
+	return (
+		frappe.get_doc(
+			{
+				"doctype": "WPS File Format",
+				"format_name": f"WPS Test {frappe.generate_hash(length=6)}",
+				"wps_agent": agent,
+				"is_active": 1,
+			}
+		)
+		.insert()
+		.name
+	)
 
 
 def _component(component_type: str, category: str) -> str:

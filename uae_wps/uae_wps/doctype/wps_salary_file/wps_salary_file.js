@@ -15,6 +15,16 @@ frappe.ui.form.on("WPS Salary File", {
 				freeze: true,
 				freeze_message: __("Fetching Salary Slips"),
 			}).then(() => frm.reload_doc());
+		});
+		frm.add_custom_button(__("Generate SIF File"), () => {
+			frm.save().then(() => {
+				frm.call({
+					doc: frm.doc,
+					method: "generate_sif",
+					freeze: true,
+					freeze_message: __("Generating the SIF file"),
+				}).then(() => frm.reload_doc());
+			});
 		}).addClass("btn-primary");
 	},
 });

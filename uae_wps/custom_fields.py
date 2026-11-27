@@ -101,6 +101,16 @@ def get_custom_fields():
 				"description": "How this component is grouped on the WPS salary file. Excluded components are stored on the file and left out of the fixed and variable totals.",
 				"module": MODULE,
 			},
+			{
+				"fieldname": "wps_evp_component",
+				"fieldtype": "Select",
+				"label": "WPS EVP Component",
+				"options": "\nHousing Allowance\nConveyance Allowance\nMedical Allowance\nAnnual Passage Allowance\nOvertime Allowance\nAll Other Allowances\nLeave Encashment",
+				"insert_after": "wps_salary_category",
+				"depends_on": "eval:doc.wps_salary_category=='Variable'",
+				"description": "Allowance column on the EVP record when the WPS File Format supports EVP. The EDR variable amount remains the total.",
+				"module": MODULE,
+			},
 		],
 		"Bank Account": [
 			{

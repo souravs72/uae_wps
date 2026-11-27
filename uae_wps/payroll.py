@@ -151,6 +151,7 @@ def write_component_rows(doc) -> None:
 					"idx": idx,
 					"salary_component": values.get("salary_component"),
 					"component_type": values.get("component_type"),
+					"evp_component": values.get("evp_component"),
 					"amount": values.get("amount"),
 				}
 			)
@@ -165,7 +166,7 @@ def load_component_rows(doc) -> None:
 	rows = frappe.get_all(
 		"WPS Salary Component Detail",
 		filters={"parent": ["in", names], "parenttype": "WPS Salary File Employee"},
-		fields=["name", "parent", "salary_component", "component_type", "amount", "idx"],
+		fields=["name", "parent", "salary_component", "component_type", "evp_component", "amount", "idx"],
 		order_by="idx asc",
 	)
 	grouped: dict[str, list[dict]] = defaultdict(list)
@@ -323,9 +324,9 @@ def _component_categories(details: dict[str, list[dict]]) -> dict[str, str]:
 	rows = _read_rows(
 		"Salary Component",
 		filters={"name": ["in", list(names)]},
-		fields=["name", "wps_salary_category"],
+		fields=["name", "wps_salary_category", "wps_evp_component"],
 	)
-	return {row.name: row.wps_salary_category for row in rows}
+	return {row.name: row for row in rows}
 
 
 def _employee_snapshot(
@@ -348,7 +349,8 @@ def _employee_snapshot(
 	variable = 0.0
 	components = []
 	for detail in detail_rows:
-		category = categories.get(detail.salary_component) or ""
+		info = categories.get(detail.salary_component)
+		category = (info.wps_salary_category if info else "") or ""
 		if category not in COMPONENT_CATEGORIES:
 			notes.append(
 				_(
@@ -362,6 +364,7 @@ def _employee_snapshot(
 			{
 				"salary_component": detail.salary_component,
 				"component_type": category,
+				"evp_component": (info.wps_evp_component or "") if category == "Variable" else "",
 				"amount": amount,
 			}
 		)

@@ -26,6 +26,7 @@ add_to_apps_screen = [
 flow_tools = [
 	"uae_wps.ai.wps_file_summary",
 	"uae_wps.ai.fetch_wps_salary_slips",
+	"uae_wps.ai.generate_wps_sif",
 ]
 flow_agents = ["uae_wps.ai.agents"]
 
