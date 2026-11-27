@@ -1,0 +1,21 @@
+{
+ "action": "Create Entry",
+ "action_label": "Add WPS File Format",
+ "creation": "2026-11-28 01:00:00.000000",
+ "description": "Field lengths, date formats, EVP support, and refund reason codes for the agent that will receive the SIF. Match what your bank or exchange house expects.",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-11-28 01:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "Create WPS File Format",
+ "owner": "Administrator",
+ "reference_document": "WPS File Format",
+ "show_form_tour": 0,
+ "show_full_form": 1,
+ "title": "Add the agent's file format",
+ "validate_action": 1
+}

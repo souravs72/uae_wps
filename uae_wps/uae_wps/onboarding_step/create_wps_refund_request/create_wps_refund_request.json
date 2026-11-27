@@ -1,0 +1,21 @@
+{
+ "action": "Create Entry",
+ "action_label": "Create Refund Request",
+ "creation": "2026-11-28 01:00:00.000000",
+ "description": "Build an RFR when wages already paid through WPS must be clawed back. Uses the refund reason codes on the file format. Optional until you need a refund.",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-11-28 01:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "Create WPS Refund Request",
+ "owner": "Administrator",
+ "reference_document": "WPS Refund Request",
+ "show_form_tour": 0,
+ "show_full_form": 1,
+ "title": "Request a refund (optional)",
+ "validate_action": 1
+}

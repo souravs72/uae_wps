@@ -1,7 +1,7 @@
 {
  "app": "uae_wps",
  "charts": [],
- "content": "[{\"id\":\"wps_header\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>UAE WPS</b></span>\",\"col\":12}},{\"id\":\"wps_files\",\"type\":\"card\",\"data\":{\"card_name\":\"Salary Files\",\"col\":4}},{\"id\":\"wps_setup\",\"type\":\"card\",\"data\":{\"card_name\":\"Setup\",\"col\":4}}]",
+ "content": "[{\"id\":\"wps_onboarding\",\"type\":\"onboarding\",\"data\":{\"onboarding_name\":\"UAE WPS Onboarding\",\"col\":12}},{\"id\":\"wps_header\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>UAE WPS</b></span>\",\"col\":12}},{\"id\":\"wps_setup\",\"type\":\"card\",\"data\":{\"card_name\":\"Setup\",\"col\":4}},{\"id\":\"wps_files\",\"type\":\"card\",\"data\":{\"card_name\":\"Salary Files\",\"col\":4}},{\"id\":\"wps_bank\",\"type\":\"card\",\"data\":{\"card_name\":\"Bank Responses\",\"col\":4}}]",
  "creation": "2026-11-23 14:20:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -16,26 +16,8 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Salary Files",
-   "link_count": 1,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "WPS Salary File",
-   "link_count": 0,
-   "link_to": "WPS Salary File",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Setup",
-   "link_count": 2,
+   "link_count": 3,
    "onboard": 0,
    "type": "Card Break"
   },
@@ -58,11 +40,68 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WPS Employee Exclusion",
+   "link_count": 0,
+   "link_to": "WPS Employee Exclusion",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Salary Files",
+   "link_count": 1,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WPS Salary File",
+   "link_count": 0,
+   "link_to": "WPS Salary File",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Bank Responses",
+   "link_count": 2,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WPS Bank Response",
+   "link_count": 0,
+   "link_to": "WPS Bank Response",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WPS Refund Request",
+   "link_count": 0,
+   "link_to": "WPS Refund Request",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2026-11-23 14:20:00.000000",
+ "modified": "2026-11-28 01:00:00.000000",
  "modified_by": "Administrator",
  "module": "UAE WPS",
+ "module_onboarding": "UAE WPS Onboarding",
  "name": "UAE WPS",
  "number_cards": [],
  "owner": "Administrator",

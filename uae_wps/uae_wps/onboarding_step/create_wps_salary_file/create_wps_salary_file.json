@@ -1,0 +1,21 @@
+{
+ "action": "Create Entry",
+ "action_label": "Create WPS Salary File",
+ "creation": "2026-11-28 01:00:00.000000",
+ "description": "Pull submitted salary slips for the period, generate the SIF, and submit the salary file. A draft does not finish this step. Run after payroll for that period is submitted.",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-11-28 02:10:00.000000",
+ "modified_by": "Administrator",
+ "name": "Create WPS Salary File",
+ "owner": "Administrator",
+ "reference_document": "WPS Salary File",
+ "show_form_tour": 0,
+ "show_full_form": 1,
+ "title": "Create your first salary file",
+ "validate_action": 1
+}

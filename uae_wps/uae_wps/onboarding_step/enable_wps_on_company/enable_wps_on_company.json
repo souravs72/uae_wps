@@ -1,0 +1,21 @@
+{
+ "action": "Go to Page",
+ "action_label": "Open Company",
+ "creation": "2026-11-28 01:00:00.000000",
+ "description": "An HR Manager, Accounts Manager, or System Manager must save this: turn on WPS, enter the 13-digit MOHRE Establishment ID, and set the default WPS bank account. On that Bank Account, set the WPS Agent. HR User can open Company but cannot save these fields. The SIF employer id comes from the MOHRE field.",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-11-28 02:10:00.000000",
+ "modified_by": "Administrator",
+ "name": "Enable WPS on Company",
+ "owner": "Administrator",
+ "path": "List/Company",
+ "show_form_tour": 0,
+ "show_full_form": 0,
+ "title": "Enable WPS on the company",
+ "validate_action": 0
+}
